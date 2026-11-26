@@ -1,0 +1,35 @@
+﻿name: ML CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install the dependencies
+        run: pip install -r requirements.txt
+      - name: Run the tests
+        run: pytest -q
+      - name: Train and track the model
+        run: python -m src.train --run-name ci
+      - name: Register the best run and export the model
+        run: python -m src.promote
+      - name: Quality gate
+        run: python -m src.evaluate --min-accuracy 0.90
+      - name: Keep the model
+        uses: actions/upload-artifact@v4
+        with:
+          name: model
+          path: model/
