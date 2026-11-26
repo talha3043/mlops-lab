@@ -1,0 +1,10 @@
+venv
+.venv
+__pycache__
+*.pyc
+mlruns
+mlflow.db
+model
+model-weak
+data/new_batch*.csv
+.pytest_cache
